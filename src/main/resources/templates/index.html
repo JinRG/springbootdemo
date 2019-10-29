@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<!--解决th报错 -->
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>welcome</title>
+</head>
+<body>
+欢迎来到主页
+<a href="/user/add">添加操作 </a>
+<a href="/user/update">更新操作 </a>
+
+<button id="btn">删除AJAX操作</button>
+<button id="test">测试操作</button>
+</body>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="/js/global.js"></script>
+<script type="text/javascript">
+$("#btn").click(function(){
+		$.ajax({
+			type:"get", // 请求类型 GET/POST
+			url:"user/deleteajax", // 请求路径
+			dataType:"json", // 预期服务器返回的数据类型 
+			data:{ // 请求参数，键值对的json对象
+				
+			},
+			success:function(data){ // 请求成功时的回调函数
+				console.log(data);
+				alert(data);
+			}
+			,error:function(data){ // 请求成功时的回调函数
+				console.log(data);
+				alert(data);
+			}
+		});
+});
+$("#test").click(function(){
+	alert("按钮测试");
+});
+
+</script>
+</html>

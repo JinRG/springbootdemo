@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--scan为true时，如果配置文件发生改变将会进行重新加载 -->
+<!-- scanPeriod属性设置监测配置文件修改的时间间隔，默认单位为毫秒，在scan为true时才生效 -->
+<configuration debug="false" scan="false" scanPeriod="1 seconds">
+	<!--   子节点<property> ：用来定义变量值，它有两个属性name和value，通过<property>定义的值会被插入到logger上下文中（相当于声明变量和初始化值一样，可以在这个xml中全局引用），可以使“${}”来使用变量。-->  　
+  <property name="APP_Name" value="myAppName" /> 
+  <property name="LOG_HOME" value="logs" /> 
+  <contextName>${APP_Name}</contextName> <!-- ${APP_Name}就是对应上面property标签定义的key为APP_Name的值-->
+  <!-- 获取当前时间戳，字符串格式 ，相当于定义了一个值为时间戳的字符串-->
+  <timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss"/> 
+  
+  <!-- appender输出目的地， 控制台、文件等 -->
+<!-- layout 输出格式。  0.9.19版本之后都用encoder来代替他，功能更强-->
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>  
+    <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
+     <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>  
+   </encoder>  
+   <!--  <layout class="ch.qos.logback.classic.PatternLayout">
+      <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+    </layout> -->
+  </appender>
+  
+  <!-- 输出到文件 :滚动日志，按照时间和大小切割-->
+<!--   <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+   <file>${LOG_HOME}/logFile.log</file>
+   <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/zip/logFile.log.%d{yyyy-MM-dd-HH-mm}.zip
+            </fileNamePattern>
+            <maxHistory>5</maxHistory>
+        </rollingPolicy>
+    <encoder>
+      <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+    </encoder>
+　　</appender>  -->
+
+ <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+<file>${LOG_HOME}/server.txt</file>
+<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+<!-- 每天一归档 -->
+  <fileNamePattern>${LOG_HOME}/history/server-%d{yyyy-MM-dd}.%i.txt</fileNamePattern>
+   <!-- 单个日志文件最多 100MB, 日志最长保留时间30（单位取决于滚动时间），最大不能超过20GB -->
+   <maxFileSize>100MB</maxFileSize>   <!--  按照大小切割多个文件之后无法使用maxHistory -->
+   <maxHistory>30</maxHistory>
+   <totalSizeCap>20GB</totalSizeCap>
+</rollingPolicy>
+<encoder>
+  <pattern>%msg%n</pattern>
+</encoder>
+</appender>
+
+    
+	<!-- 指定包名com.jrg.logback下面的日志级别为TRACE，会覆盖root的定义级别  -->
+  <logger name="com.jrg.logback" level="TRACE"/>
+  	<!-- logger还支持各种第三方扩展的 如mybatis的 -->
+	<!--myibatis log configure-->
+	<logger name="com.apache.ibatis" level="TRACE"/>
+	<logger name="java.sql.Connection" level="DEBUG"/>
+	<logger name="java.sql.Statement" level="DEBUG"/>
+	<logger name="java.sql.PreparedStatement" level="DEBUG"/>
+
+	<!--appender-ref配置之后才会真正打印日志 ，logger标签里面也可以嵌套appender-ref标签。如果没有指定就以root指定的level为准 -->
+  <root level="debug">
+    <appender-ref ref="STDOUT" />
+    <appender-ref ref="ROLLING" /> 
+  </root>
+</configuration>
